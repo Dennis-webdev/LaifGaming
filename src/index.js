@@ -1,3 +1,4 @@
+//@ flow
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { 
@@ -6,18 +7,12 @@ import {
   Route, 
   Link 
 } from 'react-router-dom';
+import Loadable from 'react-loadable';
 
-function Home() {
-  return <h2>Home</h2>;
-}
-
-function About() {
-  return <h2>About</h2>;
-}
-
-function Users() {
-  return <h2>Users</h2>;
-}
+const Pages = Loadable({
+  loader: () => import('./views/pages'),
+  loading: ({ isLoading }) => isLoading && null,
+});
 
 const App = () => {
   return (
@@ -25,23 +20,21 @@ const App = () => {
       <div>
         <nav>
           <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/about">About</Link>
-            </li>
-            <li>
-              <Link to="/users">Users</Link>
-            </li>
+            <li><Link to="/">Home</Link></li>
+            <li><Link to="/about">About</Link></li>
+            <li><Link to="/contact">Contact</Link></li>
+            <li><Link to="/support">Support</Link></li>
+            <li><Link to="/faq">FAQ</Link></li>
           </ul>
         </nav>
 
         <Switch>
-          <Route path="/" component={Home} />
-
-          <Route path="/about" component={About} />
-          <Route path="/users" component={Users} />
+          <Route exact path="/" component={Pages} />
+          <Route path="/about" component={Pages} />
+          <Route path="/contact" component={Pages} />
+          <Route path="/support" component={Pages} />
+          <Route path="/faq" component={Pages} />
+          <Route path="/terms" component={Pages} />
         </Switch>
       </div>
     </Router>
