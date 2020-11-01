@@ -8,11 +8,13 @@ const Wrapper = styled.div`
   max-width: 100vw;
 `;
 
-const Overview = () => {
-  return (
-    <div>Overview</div>
-  );
-};
+const LogoImage = styled.img`
+  width: 100%;
+  height: auto;
+  
+  @media (max-width: 600px) {
+  }
+`;
 
 type Props = {
 };
@@ -24,7 +26,7 @@ class Home extends React.Component {
   render() {
     return (
       <Wrapper>
-        <Overview />
+        <LogoImage src="/img/bg.jpg" alt="" />
       </Wrapper>
     );
   }

@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "cross-env": "^7.0.2",
     "flow-bin": "^0.137.0",
+    "react-app-rewired": "^2.1.6",
     "react-scripts": "4.0.0"
   },
   "dependencies": {
@@ -19,11 +21,9 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
+    "flow": "flow",
     "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "flow": "flow"
+    "dev:web": "cross-env NODE_PATH=./ react-app-rewired start"
   },
   "eslintConfig": {
     "extends": [
