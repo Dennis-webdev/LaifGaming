@@ -1,6 +1,7 @@
 //@ flow
 import * as React from 'react';
 import Home from './home';
+import Nav from './components/nav'
 
 type Props = {
 };
@@ -33,9 +34,9 @@ class Pages extends React.Component {
   render() {
     return (
       <div>
-        <div>
-          Navigation
-        </div>
+        <Nav 
+          location={this.props.match.path.substr(1)}
+        />
         {this.renderPage()}
       </div>
     );

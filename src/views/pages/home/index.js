@@ -27,6 +27,9 @@ class Home extends React.Component {
     return (
       <Wrapper>
         <LogoImage src="/img/bg.jpg" alt="" />
+        <LogoImage src="/img/bg.jpg" alt="" />
+        <LogoImage src="/img/bg.jpg" alt="" />
+        <LogoImage src="/img/bg.jpg" alt="" />
       </Wrapper>
     );
   }
