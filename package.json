@@ -12,8 +12,10 @@
   "dependencies": {
     "apollo-server": "^2.19.0",
     "apollo-server-express": "^2.19.0",
+    "backpack-core": "^0.8.4",
     "express": "^4.17.1",
     "graphql": "^0.13.2",
+    "morgan": "^1.10.0",
     "react": "^17.0.1",
     "react-app-rewired": "^2.1.6",
     "react-dom": "^17.0.1",
@@ -21,12 +23,14 @@
     "react-redux": "^5.0.2",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
+    "rethinkdb": "^2.4.2",
     "styled-components": "^5.2.1",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
     "flow": "flow",
     "start": "react-scripts start",
+    "dev": "cross-env DIR=api backpack",
     "dev:web": "cross-env NODE_PATH=./ react-app-rewired start"
   },
   "eslintConfig": {

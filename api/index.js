@@ -1,74 +1,66 @@
-//@ flow
-import { createServer } from 'http';
-import express from 'express';
-
+// Setup Express server
+const express = require("express");
 const app = express();
+const http = require("http").createServer(app);
 
-function log(message) {
-  process.stdout.write(`${message}\n`);
-}
+// Logging middleware
+var morgan = require("morgan");
+app.use(morgan("combined"));
 
-function normalizePort(val) {
-  const port = parseInt(val, 10);
-  if (Number.isNaN(port)) {
-    // named pipe
-    return val;
+// Serve frontend
+app.use(express.static("dist"));
+
+// Lazy RethinkDB connection
+var r = require("rethinkdb");
+let rdbConn = null;
+const rdbConnect = async function () {
+  try {
+    const conn = await r.connect({
+      host: process.env.RETHINKDB_HOST || "localhost",
+      port: process.env.RETHINKDB_PORT || 28015,
+      username: process.env.RETHINKDB_USERNAME || "admin",
+      password: process.env.RETHINKDB_PASSWORD || "",
+      db: process.env.RETHINKDB_NAME || "test",
+    });
+
+    // Handle close
+    conn.on("close", function (e) {
+      console.log("RDB connection closed: ", e);
+      rdbConn = null;
+    });
+
+    console.log("Connected to RethinkDB");
+    rdbConn = conn;
+    return conn;
+  } catch (err) {
+    throw err;
   }
-  if (port >= 0) {
-    // port number
-    return port;
+};
+const getRethinkDB = async function () {
+  if (rdbConn != null) {
+    return rdbConn;
   }
-  return false;
-}
+  return await rdbConnect();
+};
 
-const port = normalizePort(process.env.PORT || 3000);
-app.set('port', port);
+// Setup Apollo (GraphQL) server
+const { ApolloServer } = require("apollo-server-express");
+const { typeDefs, resolvers } = require("./schema.js");
+const graphqlServer = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: async (arg) => {
+    const conn = await getRethinkDB();
+    return {
+      conn: conn,
+    };
+  },
+});
+graphqlServer.applyMiddleware({ app });
+graphqlServer.installSubscriptionHandlers(http);
 
-const server = createServer(app);
-let availablePort = port;
-
-function startServer(serverPort) {
-  server.listen(serverPort);
-}
-
-function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
-  const bind = `${
-    typeof port === 'string' ? 'Pipe' : 'Port'
-  } ${port}`;
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      log(`${bind} requires elevated privileges`);
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      if (availablePort - port < 10) {
-        availablePort += 1;
-        startServer(availablePort);
-      } else {
-        log(`${bind} is already in use`);
-        process.exit(1);
-      }
-      break;
-    default:
-      throw error;
-  }
-}
-
-function onListening() {
-  const addr = server.address();
-  const bind = `${
-    typeof addr === 'string' ? 'pipe' : 'port'
-  } ${
-    typeof addr === 'string' ? addr : addr.port
-  }`;
-  log(`Server is listening on ${bind}`);
-  log(`Visit: http://localhost:${addr.port}`);
-}
-
-server.on('error', onError);
-server.on('listening', onListening);
-startServer(availablePort);
+// HTTP server (start listening)
+const listenPort = process.env.PORT || "3000";
+http.listen(listenPort, () => {
+  console.log("listening on *:" + listenPort);
+});
